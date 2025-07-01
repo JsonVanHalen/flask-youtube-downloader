@@ -1,10 +1,7 @@
 {
   "name": "Flask + yt-dlp Dev",
   "image": "mcr.microsoft.com/devcontainers/python:3.11",
-  "features": {
-    "ghcr.io/devcontainers/features/ffmpeg:1": {}
-  },
-  "postCreateCommand": "pip install -r requirements.txt && pip install sqlite-utils",
+  "postCreateCommand": "apt-get update && apt-get install -y ffmpeg && pip install -r requirements.txt && pip install sqlite-utils",
   "forwardPorts": [5000],
   "customizations": {
     "vscode": {
