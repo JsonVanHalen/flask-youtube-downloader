@@ -161,6 +161,10 @@ def get_history():
         return jsonify(history)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+        
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("404.html"), 404
 
 def batch_download_from_json(json_file='video_urls.json'):
     try:
