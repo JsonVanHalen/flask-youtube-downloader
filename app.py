@@ -7,6 +7,7 @@ import time
 import json
 
 app = Flask(__name__)
+app.config['EXPLAIN_TEMPLATE_LOADING'] = True
 
 def log_download(info, mode, quality_or_bitrate, filename):
     """Persist download metadata, including real thumbnail URL."""
