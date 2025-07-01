@@ -1,9 +1,10 @@
 # app.py
 
 from flask import Flask, render_template, request, send_file, after_this_request, jsonify
-import yt_dlp, os, glob, sqlite3, tempfile, shutil
 from datetime import datetime
+import yt_dlp, os, glob, sqlite3, tempfile, shutil
 import time
+import json
 
 app = Flask(__name__)
 
@@ -109,7 +110,6 @@ def index():
 
     return render_template('index.html')
 
-
 @app.route('/preview', methods=['POST'])
 def preview():
     url = request.form['url'].strip()
@@ -133,7 +133,6 @@ def preview():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 400
-
 
 @app.route('/history', methods=['GET'])
 def get_history():
@@ -162,6 +161,33 @@ def get_history():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+def batch_download_from_json(json_file='video_urls.json'):
+    try:
+        with open(json_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            video_urls = data.get('videos', [])
+            mode = data.get('mode', 'video')
+            quality = data.get('quality', 'best')
+            audio_bitrate = data.get('audio_bitrate', '192')
+
+            for url in video_urls:
+                print(f"[+] Downloading: {url}")
+                # Mimic the POST behavior from index()
+                with app.test_request_context(method='POST', data={
+                    'url': url,
+                    'format': mode,
+                    'quality': quality,
+                    'audio_bitrate': audio_bitrate
+                }):
+                    response = index()
+                    print(f"[✓] Done: {url}")
+
+    except Exception as e:
+        print(f"[!] Batch download failed: {e}")
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == 'batch':
+        batch_download_from_json()
+    else:
+        app.run(debug=True)
