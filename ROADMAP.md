@@ -31,6 +31,7 @@ This roadmap outlines planned features, improvements, and stretch goals for the 
 - 🚀 Dockerize the app with environment-based config
 - 🔒 Add auth for shared/multi-user deployment
 - ✨ Enable auto-subtitle generation via Whisper (stretch)
+- ⏳ Add progress indicators to show real-time download status
 
 ---
 

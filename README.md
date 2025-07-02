@@ -10,7 +10,7 @@
 - ✅ Video/audio downloads via `yt-dlp`
 - 🎚️ Resolution and format selectors
 - 🗒️ Subtitle and cookie file support (WIP)
-- 📊 Download history with inline progress
+- 📊 Actionable Download history
 - 🖥️ Flask web UI with video preview
 
 [🛣️ Roadmap](./ROADMAP.md) • [📘 Changelog](./CHANGELOG.md)
