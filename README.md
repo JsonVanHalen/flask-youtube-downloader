@@ -1,6 +1,6 @@
 # JPMC YouTube Downloader
 
-> A Flask-based web app to preview and download YouTube videos and audio — with support for subtitles and user-supplied cookies.
+> A Flask-based web app to preview and download YouTube videos and audio — with support for subtitles and user-supplied cookies coming soon, hopefully....
 
 ![version](https://img.shields.io/badge/version-1.0-blue)
 [📘 View Changelog](./CHANGELOG.md)
