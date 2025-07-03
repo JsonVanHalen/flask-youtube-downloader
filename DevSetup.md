@@ -61,3 +61,16 @@ A step-by-step routine to wipe and reboot your Flask dev environment from scratc
 ┌────────────────────────────┐
 │ 6. Run, build, commit 🚀   │
 └────────────────────────────┘
+
+---
+
+# 🧪 Project Execution Workflow
+
+After setting up your workspace and activating the virtual environment, follow these steps to run the application or test scripts.
+
+## ✅ Virtual Environment Setup
+
+1. Create a new virtual environment:
+
+   ```bash
+   python3 -m venv venv
