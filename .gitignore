@@ -15,6 +15,12 @@ __pycache__/
 # VS Code config (optional)
 .vscode/
 
+# Ignore all files inside cookies/
+cookies/*
+
+# But allow the folder itself and keep it visible
+!cookies/.gitkeep
+
 # OS junk
 .DS_Store
 Thumbs.db

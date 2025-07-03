@@ -31,6 +31,13 @@
   </style>
 </head>
 <body>
+  <hr>
+  <form id="cookie-upload-form" method="POST" enctype="multipart/form-data" action="/upload-cookies">
+    <input type="file" id="cookieFile" name="cookieFile" style="display: none;" onchange="submitCookieForm()">
+    <button type="button" style="margin-top:1em;" onclick="document.getElementById('cookieFile').click()">
+      Upload Cookies
+    </button>
+  </form>
   <div class="form-container">
     <div style="text-align: center;">
       <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" height="80" class="logo">
@@ -104,6 +111,10 @@
   </div>
 
   <script>
+    function submitCookieForm() {
+      document.getElementById('cookie-upload-form').submit();
+    }
+
     function toggleOptions() {
       const mode = document.getElementById('format').value;
       document.getElementById('videoOptions').style.display = (mode === 'video') ? 'block' : 'none';

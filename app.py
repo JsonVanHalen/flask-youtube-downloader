@@ -1,6 +1,6 @@
 # app.py
 
-from flask import Flask, render_template, request, send_file, after_this_request, jsonify
+from flask import Flask, redirect, render_template, request, send_file, after_this_request, jsonify
 from datetime import datetime
 import yt_dlp, os, glob, sqlite3, tempfile, shutil
 import time
@@ -41,6 +41,24 @@ def log_download(info, mode, quality_or_bitrate, filename):
     except Exception as e:
         print(f"[!] Failed to log download: {e}")
 
+@app.route('/upload-cookies', methods=['POST'])
+def upload_cookies():
+    UPLOAD_FOLDER = 'cookies'
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+    file = request.files.get('cookieFile')
+    if file and file.filename:
+        save_path = os.path.join(UPLOAD_FOLDER, 'youtube.cookies.txt')
+        try:
+            file.save(save_path)
+            print(f"[✓] Cookie file saved to {save_path}")
+            return redirect('/')
+        except Exception as e:
+            print(f"[!] Error saving cookie file: {e}")
+            return "Upload failed", 500
+    print("[!] No cookie file found in request")
+    return "Upload failed", 400
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
@@ -66,13 +84,15 @@ def index():
             'format': fmt,
             'outtmpl': outtmpl,
             'restrictfilenames': True,
-            'quiet': True
+            'verbose': True, #'quiet': True,
+            'cookies': os.path.join('cookies', 'youtube.cookies.txt'),
         }
         if mode == 'audio':
             ydl_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'mp3',
-                'preferredquality': audio_bitrate
+                'preferredquality': audio_bitrate,
+                'cookies': os.path.join('cookies', 'youtube.cookies.txt'),
             }]
 
         try:
@@ -115,9 +135,15 @@ def index():
 def preview():
     url = request.form['url'].strip()
     try:
-        with yt_dlp.YoutubeDL({'quiet': True}) as ydl:
+        #with yt_dlp.YoutubeDL({'quiet': True}) as ydl:
+        #    info = ydl.extract_info(url, download=False)
+        ydl_opts = {
+            'quiet': True,
+            'cookies': os.path.join('cookies', 'youtube.cookies.txt')
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
-
+            
         formats = info.get('formats', [])
         resolutions = sorted({
             f['height'] for f in formats
