@@ -10,7 +10,6 @@ This roadmap outlines planned features, improvements, and stretch goals for the 
 - yt-dlp integration for video/audio
 - Format/resolution selection
 - Download history panel
-- Experimental cookie + subtitle file support
 - Version tagging and changelog setup
 
 ---
@@ -32,6 +31,7 @@ This roadmap outlines planned features, improvements, and stretch goals for the 
 - 🔒 Add auth for shared/multi-user deployment
 - ✨ Enable auto-subtitle generation via Whisper (stretch)
 - ⏳ Add progress indicators to show real-time download status
+- 🚀 Experimental cookie + subtitle file support
 
 ---
 
