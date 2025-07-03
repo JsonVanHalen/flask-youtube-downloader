@@ -12,7 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
 - Flask-based web interface for previewing YouTube videos
 - yt-dlp integration for video/audio downloading
-- Subtitle and cookie file upload support (experimental)
 - Resolution and format selector in the form
 - Download history with progress bar and metadata
 - Visual indicators for audio vs. video types
