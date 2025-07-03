@@ -9,7 +9,6 @@
 
 - ✅ Video/audio downloads via `yt-dlp`
 - 🎚️ Resolution and format selectors
-- 🗒️ Subtitle and cookie file support (WIP)
 - 📊 Actionable Download history
 - 🖥️ Flask web UI with video preview
 
