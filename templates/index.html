@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>JPMC YTDL! v1.7</title>
+  <title>JPMC YTDL! v1.0</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <style>
     #videoOptions, #audioOptions,
@@ -43,7 +43,7 @@
       <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" height="80" class="logo">
       <div class="branding">
         <h1>JPMC YouTube Downloader</h1>
-        <h3>v1.7</h3>
+        <h3>v1.0</h3>
       </div>
     </div>
 
@@ -111,9 +111,74 @@
   </div>
 
   <script>
-    function submitCookieForm() {
-      document.getElementById('cookie-upload-form').submit();
+  function submitCookieForm() {
+    const form = document.getElementById('cookie-upload-form');
+    const fileInput = form.querySelector('input[name="cookieFile"]');
+    const formData = new FormData();
+    formData.append('cookieFile', fileInput.files[0]);
+
+    fetch('/upload-cookies', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => {
+      if (response.ok) {
+        console.log('[✓] Cookie file uploaded');
+
+        // Clear previous status messages
+        const oldMessages = form.querySelectorAll('div');
+        oldMessages.forEach(msg => msg.remove());
+
+        // Refresh cookie status summary
+        loadCookieStatus();
+      } else {
+        throw new Error('Upload failed');
+      }
+    })
+    .catch(err => {
+      console.error('[!] Upload error:', err);
+      alert('Upload failed — check console for details');
+    });
+  }
+
+    
+    function loadCookieStatus() {
+  Promise.all([
+    fetch('/cookie-status').then(r => r.json()),
+    fetch('/validate-cookies').then(r => r.json())
+  ]).then(([status, validation]) => {
+    const container = document.createElement('div');
+    container.style.marginTop = '1em';
+    container.style.fontStyle = 'italic';
+
+    // Detection message
+    if (status.available) {
+      const detectedMsg = document.createElement('div');
+      detectedMsg.textContent = `✓ Cookie file detected: ${status.filename} (last updated ${status.modified})`;
+      detectedMsg.style.color = '#6cf';
+      container.appendChild(detectedMsg);
+
+      // Summary below detection
+      const summaryMsg = document.createElement('div');
+      if (validation.valid) {
+        summaryMsg.textContent = `${validation.message} — ${validation.cookies_found} key cookies detected`;
+        summaryMsg.style.color = '#9f9';
+      } else {
+        summaryMsg.textContent = `⚠️ Cookie file issue: ${validation.reason}`;
+        summaryMsg.style.color = '#f88';
+      }
+      container.appendChild(summaryMsg);
+    } else {
+      const noFileMsg = document.createElement('div');
+      noFileMsg.textContent = `No cookie file available. Upload one to enable authenticated downloads.`;
+      noFileMsg.style.color = '#f88';
+      container.appendChild(noFileMsg);
     }
+
+    document.getElementById('cookie-upload-form')?.appendChild(container);
+  }).catch(err => console.error('Cookie status/validation error:', err));
+}
+
 
     function toggleOptions() {
       const mode = document.getElementById('format').value;
@@ -234,6 +299,9 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       toggleOptions();
+
+      // other init logic…
+      loadCookieStatus();
 
       const urlEl = document.getElementById('urlInput');
       urlEl.addEventListener('keydown', e => {

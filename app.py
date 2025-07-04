@@ -2,12 +2,45 @@
 
 from flask import Flask, redirect, render_template, request, send_file, after_this_request, jsonify
 from datetime import datetime
+from zoneinfo import ZoneInfo  # Add this near your imports
 import yt_dlp, os, glob, sqlite3, tempfile, shutil
 import time
 import json
 
 app = Flask(__name__)
 app.config['EXPLAIN_TEMPLATE_LOADING'] = True
+
+def validate_cookie_file(path='cookies/youtube.cookies.txt'):
+    try:
+        if not os.path.exists(path):
+            return {'valid': False, 'reason': 'File not found'}
+
+        with open(path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        if not content.startswith('# Netscape HTTP Cookie File'):
+            return {'valid': False, 'reason': 'Missing Netscape format header'}
+
+        required_cookies = ['SID', 'HSID', 'SSID', 'SAPISID', 'LOGIN_INFO', 'VISITOR_INFO1_LIVE']
+        found_cookies = [line for line in content.splitlines() if any(cookie in line for cookie in required_cookies)]
+
+        if not found_cookies:
+            return {'valid': False, 'reason': 'Required auth cookies not found'}
+
+        timestamp = os.path.getmtime(path)
+        dt = datetime.fromtimestamp(timestamp, tz=ZoneInfo('America/Chicago'))
+        formatted = dt.strftime('%Y-%m-%d %I:%M:%S %p') + ' (GMT-6 / USA Central - Chicago)'
+
+        return {
+            'valid': True,
+            'filename': os.path.basename(path),
+            'modified': formatted,
+            'cookies_found': len(found_cookies),
+            'message': '✓ Cookie file is valid and looks fresh'
+        }
+
+    except Exception as e:
+        return {'valid': False, 'reason': f'Error: {str(e)}'}
 
 def log_download(info, mode, quality_or_bitrate, filename):
     """Persist download metadata, including real thumbnail URL."""
@@ -40,6 +73,32 @@ def log_download(info, mode, quality_or_bitrate, filename):
         conn.close()
     except Exception as e:
         print(f"[!] Failed to log download: {e}")
+
+@app.route('/validate-cookies', methods=['GET'])
+def validate_cookies_route():
+    result = validate_cookie_file()
+    return jsonify(result)
+
+@app.route('/cookie-status', methods=['GET'])
+def cookie_status():
+    folder = 'cookies'
+    try:
+        files = [f for f in os.listdir(folder) if f.endswith('.txt')]
+        if not files:
+            return jsonify({'available': False, 'message': 'No cookies file found'})
+        
+        latest = max(files, key=lambda f: os.path.getmtime(os.path.join(folder, f)))
+        timestamp = os.path.getmtime(os.path.join(folder, latest))
+        dt = datetime.fromtimestamp(timestamp, tz=ZoneInfo('America/Chicago'))
+        formatted = dt.strftime('%Y-%m-%d %I:%M:%S %p') + ' (GMT-6 / USA Central - Chicago)'
+        
+        return jsonify({
+            'available': True,
+            'filename': latest,
+            'modified': formatted
+        })
+    except Exception as e:
+        return jsonify({'available': False, 'error': str(e)}), 500
 
 @app.route('/upload-cookies', methods=['POST'])
 def upload_cookies():

@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Resolution and format selector in the form
 - Download history with progress bar and metadata
 - Visual indicators for audio vs. video types
+- Cookie status dashboard with live validation and freshness display
+- Frontend integration for automatic refresh of cookie health after upload
+- JavaScript-based cookie upload without page reload for improved UX
 
 ### Known Issues
 - Cookie file upload not yet effective in bypassing YouTube rate limits
